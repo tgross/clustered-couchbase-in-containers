@@ -22,7 +22,7 @@ couchbase4:
     image: 0x74696d/triton-couchbase:4.0.0
     links:
     - consul
-    mem_limit: 128g
+    mem_limit: 32g
     ports:
     - 8091
     - 8092
@@ -62,56 +62,42 @@ benchmark_test:
 
 # run the client to create indexes. this client will exit when complete
 benchmark_index:
-    image: 0x74696d/cbc-benchmark
+    image: 0x74696d/cbc-benchmark-go
     mem_limit: 256m
     links:
     - consul
-    environment:
-    - ITEMS=1000000
-    command: /bin/cbc-benchmark index
+    command: /bin/cbc-benchmark -index -debug -i 1000000
     restart: never
 
 # run the client to load test data. this client will exit when complete
 benchmark_load:
-    image: 0x74696d/cbc-benchmark
+    image: 0x74696d/cbc-benchmark-go
     mem_limit: 1g
     links:
     - consul
-    environment:
-    - ITEMS=1000000
-    command: /bin/cbc-benchmark load
+    command: /bin/cbc-benchmark -load -debug -i 1000000
     restart: never
 
 # run the client to benchmark n1ql queries
 benchmark_n1ql:
-    image: 0x74696d/cbc-benchmark
+    image: 0x74696d/cbc-benchmark-go
     mem_limit: 64g
     links:
     - consul
-    environment:
-    - ITEMS=1000000
-    - THREADS=10
-    command: /bin/cbc-benchmark n1qlTest
+    command: /bin/cbc-benchmark -n1ql -i 1000000 -debug -c 1
 
 # run the client to benchmark via pillowfight
 benchmark_pillowfight:
-    image: 0x74696d/cbc-benchmark
+    image: 0x74696d/cbc-benchmark-go
     mem_limit: 64g
     links:
     - consul
-    environment:
-    - ITEMS=93750000
-    - THREADS=20
-    - TIMEOUT=10000000
-    command: /bin/cbc-benchmark pillowfight
+    command: /bin/cbc-benchmark -keys -i 1000000 -debug -c 10
 
 # run the client to benchmark view queries
 benchmark_views:
-    image: 0x74696d/cbc-benchmark
+    image: 0x74696d/cbc-benchmark-go
     mem_limit: 64g
     links:
     - consul
-    environment:
-    - ITEMS=1000000
-    - THREADS=10
-    command: /bin/cbc-benchmark view
+    command: /bin/cbc-benchmark -view -i 1000000 -debug -c 10
